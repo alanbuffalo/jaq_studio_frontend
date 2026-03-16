@@ -20,7 +20,7 @@ Este arquivo deve ficar na raiz do projeto e ser usado como referencia principal
 ## Base utilizada
 
 Este documento foi construido a partir de:
-- [ERP_AGENCIA_MARKETING_REQUISITOS.md](D:/Dev/JAQ_STUDIO/jaq_studio_backend/ERP_AGENCIA_MARKETING_REQUISITOS.md)
+- ``ERP_AGENCIA_MARKETING_REQUISITOS.md`` que esta no BACKEND
 - stack atual do frontend em React + TypeScript + Vite + Tailwind
 - referencias visuais e funcionais pesquisadas em produtos de mercado
 
