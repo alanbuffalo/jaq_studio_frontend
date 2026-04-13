@@ -1,14 +1,12 @@
-﻿import { http } from './http';
-import type { User } from '../types/auth';
+import { http } from './http';
 import type { ApiListResponse } from '../types/api';
+import type { User } from '../types/auth';
 
-export interface Agency {
+export interface AgencySettings {
   id?: number;
   legal_name?: string;
-  name?: string;
   trade_name?: string;
   tax_id?: string;
-  cnpj?: string;
   email?: string;
   phone?: string;
   website?: string;
@@ -22,12 +20,19 @@ export interface Agency {
   address_city?: string;
   address_state?: string;
   address_zip_code?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zip_code?: string;
+  timezone?: string;
+  currency?: string;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  bank_name?: string;
+  bank_branch?: string;
+  bank_account?: string;
+  pix_key?: string;
   [key: string]: unknown;
 }
+
+export type Agency = AgencySettings;
 
 export interface CepAddress {
   cep: string;
@@ -47,13 +52,6 @@ export interface CityOption {
   name: string;
 }
 
-export interface HomePayload {
-  message?: string;
-  user?: User;
-  permissions?: string[];
-  [key: string]: unknown;
-}
-
 export interface UserInput {
   email: string;
   first_name?: string;
@@ -65,18 +63,13 @@ export interface UserInput {
 }
 
 export const coreApi = {
-  home: async (): Promise<HomePayload> => {
-    const { data } = await http.get<HomePayload>('/api/home/');
+  getAgency: async (): Promise<AgencySettings> => {
+    const { data } = await http.get<AgencySettings>('/api/core/agency/');
     return data;
   },
 
-  getAgency: async (): Promise<Agency> => {
-    const { data } = await http.get<Agency>('/api/core/agency/');
-    return data;
-  },
-
-  updateAgency: async (payload: Partial<Agency>): Promise<Agency> => {
-    const { data } = await http.patch<Agency>('/api/core/agency/', payload);
+  updateAgency: async (payload: Partial<AgencySettings>): Promise<AgencySettings> => {
+    const { data } = await http.patch<AgencySettings>('/api/core/agency/', payload);
     return data;
   },
 
@@ -99,16 +92,8 @@ export const coreApi = {
     return data;
   },
 
-  createUser: async (payload: UserInput): Promise<User> => {
-    const { data } = await http.post<User>('/api/auth/register/', payload);
-    return data;
-  },
-
   listUsers: async (): Promise<User[]> => {
-    const { data } = await http.get<User[] | ApiListResponse<User>>('/api/auth/users/');
-    if (Array.isArray(data)) {
-      return data;
-    }
+    const { data } = await http.get<ApiListResponse<User>>('/api/auth/users/');
     return data.results ?? [];
   },
 
@@ -117,12 +102,13 @@ export const coreApi = {
     return data;
   },
 
+  createUser: async (payload: UserInput): Promise<User> => {
+    const { data } = await http.post<User>('/api/auth/users/', payload);
+    return data;
+  },
+
   updateUser: async (id: string, payload: Partial<UserInput>): Promise<User> => {
     const { data } = await http.patch<User>(`/api/auth/users/${id}/`, payload);
     return data;
   },
 };
-
-
-
-

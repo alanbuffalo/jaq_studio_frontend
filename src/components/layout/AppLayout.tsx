@@ -1,20 +1,33 @@
 import { Outlet } from 'react-router-dom';
-import { useState } from 'react';
-import { Sidebar } from './Sidebar';
+import { useEffect, useState } from 'react';
 import { Header } from './Header';
-import { useAuth } from '../../hooks/useAuth';
+import { Sidebar } from './Sidebar';
 
 export function AppLayout() {
-  const { user } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [compact, setCompact] = useState(false);
+
+  useEffect(() => {
+    setCompact(window.localStorage.getItem('jaq:sidebar:compact') === '1');
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('jaq:sidebar:compact', compact ? '1' : '0');
+  }, [compact]);
 
   return (
-    <div className='flex min-h-screen'>
-      <Sidebar role={user?.role} mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
-      <div className='flex min-w-0 flex-1 flex-col'>
+    <div className='min-h-screen bg-app text-slate-900'>
+      <Sidebar
+        mobileOpen={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        compact={compact}
+        onToggleCompact={() => setCompact((current) => !current)}
+      />
+
+      <div className={compact ? 'lg:pl-[84px]' : 'lg:pl-[248px]'}>
         <Header onToggleSidebar={() => setMobileOpen(true)} />
-        <main className='flex-1 px-4 py-6 lg:px-6'>
-          <div className='mx-auto w-full max-w-7xl'>
+        <main className='px-4 py-5 lg:px-8 lg:py-6'>
+          <div className='mx-auto w-full max-w-[1480px] app-enter'>
             <Outlet />
           </div>
         </main>
@@ -22,4 +35,3 @@ export function AppLayout() {
     </div>
   );
 }
-

@@ -10,11 +10,11 @@ interface CardProps {
 
 export function Card({ title, subtitle, action, children, className }: CardProps) {
   return (
-    <section className={cn('panel animate-fadeInUp p-5 md:p-6', className)}>
-      <header className='mb-4 flex flex-wrap items-center justify-between gap-3'>
+    <section className={cn('panel p-5 md:p-6', className)}>
+      <header className='mb-5 flex flex-wrap items-start justify-between gap-3'>
         <div>
-          <h2 className='text-lg font-semibold text-slate-900'>{title}</h2>
-          {subtitle ? <p className='text-sm text-slate-500'>{subtitle}</p> : null}
+          <h2 className='text-lg font-semibold tracking-[-0.02em] text-slate-950'>{title}</h2>
+          {subtitle ? <p className='mt-1 text-sm text-slate-500'>{subtitle}</p> : null}
         </div>
         {action}
       </header>

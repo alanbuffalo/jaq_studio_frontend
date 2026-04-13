@@ -1,6 +1,7 @@
-﻿import { http } from './http';
+import { http } from './http';
 import { tokenStore } from './tokens';
-import type { LoginPayload, LoginResponse, User } from '../types/auth';
+import type { ApiListResponse } from '../types/api';
+import type { AccessMatrix, LoginPayload, LoginResponse, User } from '../types/auth';
 
 export const authApi = {
   login: async (payload: LoginPayload): Promise<LoginResponse> => {
@@ -14,13 +15,18 @@ export const authApi = {
     return data;
   },
 
+  access: async (): Promise<AccessMatrix> => {
+    const { data } = await http.get<AccessMatrix>('/api/auth/access/');
+    return data;
+  },
+
   updateMe: async (payload: Record<string, unknown>): Promise<User> => {
     const { data } = await http.patch<User>('/api/auth/me/', payload);
     return data;
   },
 
-  updateMyPhoto: async (photo_bytes: string | null): Promise<User> => {
-    const { data } = await http.patch<User>('/api/auth/me/photo/', { photo_bytes });
+  updateMyPhoto: async (photoBytes: string | null): Promise<User> => {
+    const { data } = await http.patch<User>('/api/auth/me/photo/', { photo_bytes: photoBytes });
     return data;
   },
 
@@ -33,12 +39,28 @@ export const authApi = {
     try {
       await http.post('/api/auth/logout/');
     } catch {
-      // Endpoint opcional: se não existir, apenas segue limpando estado local
+      // Endpoint opcional: se não existir, apenas segue limpando estado local.
     }
     tokenStore.clear();
   },
+
+  listUsers: async (): Promise<ApiListResponse<User>> => {
+    const { data } = await http.get<ApiListResponse<User>>('/api/auth/users/');
+    return data;
+  },
+
+  getUser: async (id: string | number): Promise<User> => {
+    const { data } = await http.get<User>(`/api/auth/users/${id}/`);
+    return data;
+  },
+
+  createUser: async (payload: Record<string, unknown>): Promise<User> => {
+    const { data } = await http.post<User>('/api/auth/users/', payload);
+    return data;
+  },
+
+  updateUser: async (id: string | number, payload: Record<string, unknown>): Promise<User> => {
+    const { data } = await http.patch<User>(`/api/auth/users/${id}/`, payload);
+    return data;
+  },
 };
-
-
-
-

@@ -5,11 +5,13 @@ import { PageLoader } from '../common/PageLoader';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   roles?: string[];
+  modules?: string[];
+  permissions?: string[];
 }
 
-export function ProtectedRoute({ children, roles }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, roles, modules, permissions }: ProtectedRouteProps) {
   const location = useLocation();
-  const { loading, isAuthenticated, user } = useAuth();
+  const { loading, isAuthenticated, user, canAccessModule, canAccessPermission } = useAuth();
 
   if (loading) {
     return <PageLoader />;
@@ -19,10 +21,17 @@ export function ProtectedRoute({ children, roles }: ProtectedRouteProps) {
     return <Navigate to='/login' replace state={{ from: location.pathname }} />;
   }
 
-  if (roles && user && !roles.includes(user.role)) {
+  if (roles?.length && user && !roles.includes(user.role)) {
+    return <Navigate to='/' replace />;
+  }
+
+  if (modules?.length && !canAccessModule(...modules)) {
+    return <Navigate to='/' replace />;
+  }
+
+  if (permissions?.length && !canAccessPermission(...permissions)) {
     return <Navigate to='/' replace />;
   }
 
   return <>{children}</>;
 }
-

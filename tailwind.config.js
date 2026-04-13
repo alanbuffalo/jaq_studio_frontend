@@ -4,21 +4,22 @@ export default {
   theme: {
     extend: {
       colors: {
+        app: '#f4f1eb',
         brand: {
-          50: '#eef4ff',
-          100: '#dde9ff',
-          200: '#bfd4ff',
-          300: '#93b4ff',
-          400: '#648cff',
-          500: '#465fff',
-          600: '#3641f5',
-          700: '#2b31dd',
-          800: '#252caf',
-          900: '#252f85',
+          50: '#f7efee',
+          100: '#efdfde',
+          200: '#dfbfbd',
+          300: '#cf9f9c',
+          400: '#c28e8b',
+          500: '#b9817f',
+          600: '#9f6765',
+          700: '#835352',
+          800: '#684342',
+          900: '#4d3232',
         },
       },
       boxShadow: {
-        card: '0 6px 18px rgba(28, 39, 76, 0.08)',
+        card: '0 24px 56px rgba(23, 32, 51, 0.08)',
       },
       keyframes: {
         fadeInUp: {
@@ -33,4 +34,3 @@ export default {
   },
   plugins: [],
 };
-

@@ -1,120 +1,80 @@
-﻿import { ChevronDown, LogOut, Menu, Settings, UserRound } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Bell, Menu, Search } from 'lucide-react';
+import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-
-function initials(name: string) {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('');
-}
-
-export function UserMenu() {
-  const navigate = useNavigate();
-  const { user, signOut } = useAuth();
-  const [open, setOpen] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const onClick = (event: MouseEvent) => {
-      if (!wrapperRef.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('click', onClick);
-    return () => document.removeEventListener('click', onClick);
-  }, []);
-
-  const displayName =
-    user?.full_name || user?.name || `${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim() || 'Usuário';
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/login', { replace: true });
-  };
-
-  return (
-    <div className='relative' ref={wrapperRef}>
-      <button
-        onClick={() => setOpen((value) => !value)}
-        className='flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 shadow-sm transition hover:border-slate-300'
-      >
-        {user?.photo_bytes ? (
-          <img src={`data:image/jpeg;base64,${user.photo_bytes}`} className='h-10 w-10 rounded-full object-cover' />
-        ) : (
-          <div className='grid h-10 w-10 place-items-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700'>
-            {initials(displayName)}
-          </div>
-        )}
-        <div className='hidden text-left md:block'>
-          <p className='text-sm font-medium text-slate-900'>{displayName}</p>
-          <p className='text-xs text-slate-500'>{user?.email}</p>
-        </div>
-        <ChevronDown size={16} className={`text-slate-500 transition ${open ? 'rotate-180' : ''}`} />
-      </button>
-
-      {open ? (
-        <div className='absolute right-0 z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl'>
-          <div className='border-b border-slate-100 px-4 py-3'>
-            <p className='text-sm font-semibold text-slate-900'>{displayName}</p>
-            <p className='text-xs text-slate-500'>{user?.role}</p>
-          </div>
-          <nav className='p-2'>
-            <Link
-              to='/perfil'
-              className='flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100'
-              onClick={() => setOpen(false)}
-            >
-              <UserRound size={16} />
-              Meu Perfil
-            </Link>
-            <Link
-              to='/configuracoes/agencia'
-              className='flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100'
-              onClick={() => setOpen(false)}
-            >
-              <Settings size={16} />
-              Configurações
-            </Link>
-            <button
-              onClick={handleSignOut}
-              className='flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-rose-600 transition hover:bg-rose-50'
-            >
-              <LogOut size={16} />
-              Sair
-            </button>
-          </nav>
-        </div>
-      ) : null}
-    </div>
-  );
-}
 
 interface HeaderProps {
   onToggleSidebar: () => void;
 }
 
 export function Header({ onToggleSidebar }: HeaderProps) {
+  const { user, signOut, canAccessModule } = useAuth();
+
+  const initials = useMemo(() => {
+    const source = `${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim() || user?.email || 'JAQ';
+    return source
+      .split(' ')
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join('');
+  }, [user?.email, user?.first_name, user?.last_name]);
+
   return (
-    <header className='sticky top-0 z-30 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur lg:px-6'>
-      <div className='flex items-center justify-between gap-3'>
+    <header className='sticky top-0 z-30 border-b border-slate-200/80 bg-[rgba(247,247,243,0.82)] backdrop-blur-xl'>
+      <div className='mx-auto flex min-h-[64px] max-w-[1600px] items-center gap-3 px-4 lg:px-8'>
         <button
+          type='button'
           onClick={onToggleSidebar}
-          className='grid h-10 w-10 place-items-center rounded-lg border border-slate-200 text-slate-600 lg:hidden'
+          className='inline-flex size-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:border-slate-300 lg:hidden'
+          aria-label='Abrir menu'
         >
           <Menu size={18} />
         </button>
-        <div className='hidden md:block'>
-          <h1 className='text-base font-semibold text-slate-900'>Painel Administrativo</h1>
-          <p className='text-xs text-slate-500'>Visual TailAdmin com integração Django JWT</p>
+
+        <div className='hidden min-w-0 flex-1 lg:flex'>
+          <label className='relative w-full max-w-md'>
+            <Search className='pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400' />
+            <input
+              type='text'
+              placeholder='Buscar'
+              className='field-input h-10 rounded-full bg-white/85 pl-10 pr-4'
+            />
+          </label>
         </div>
-        <UserMenu />
+
+        <div className='ml-auto flex items-center gap-2'>
+          {canAccessModule('notifications') ? (
+            <Link
+              to='/notificacoes'
+              className='relative inline-flex size-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:border-slate-300'
+              aria-label='Notificações'
+            >
+              <Bell size={17} />
+              <span className='absolute right-2.5 top-2.5 size-1.5 rounded-full bg-[#b9817f]' />
+            </Link>
+          ) : null}
+
+          <Link
+            to='/perfil'
+            className='inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white py-1 pl-1 pr-3 transition hover:border-slate-300'
+          >
+            <span className='grid size-8 place-items-center rounded-full bg-[#121826] text-[11px] font-semibold text-white'>{initials}</span>
+            <span className='hidden min-w-0 sm:block'>
+              <span className='block truncate text-sm font-medium text-slate-900'>
+                {user?.full_name || user?.name || user?.first_name || user?.email}
+              </span>
+            </span>
+          </Link>
+
+          <button
+            type='button'
+            onClick={() => void signOut()}
+            className='hidden rounded-full px-3 py-2 text-sm font-medium text-slate-500 transition hover:bg-white hover:text-slate-900 lg:inline-flex'
+          >
+            Sair
+          </button>
+        </div>
       </div>
     </header>
   );
 }
-
-

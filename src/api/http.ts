@@ -19,7 +19,7 @@ const handleQueue = () => {
 
 export const http = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true,
+  withCredentials: false,
 });
 
 http.interceptors.request.use((config: InternalAxiosRequestConfig) => {

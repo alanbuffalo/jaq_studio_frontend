@@ -13,6 +13,12 @@ export interface User {
   [key: string]: unknown;
 }
 
+export interface AccessMatrix {
+  role: Role | string;
+  permissions: Record<string, boolean>;
+  modules: Record<string, boolean>;
+}
+
 export interface LoginPayload {
   email: string;
   password: string;
